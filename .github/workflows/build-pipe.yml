@@ -1,0 +1,78 @@
+name: test-build-code
+
+on: [push]
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - run: git fetch --no-tags --prune --depth=1 origin
+    - name: Run node 14
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14.11.0
+    - run: npm config set //npm.pkg.github.com/:_authToken $secrets.PERSONAL_ACCESS_TOKEN
+    - run: npm config set @paystackhq:registry https://npm.pkg.github.com
+    - run: npm install yarn -g
+    - name: Cache node modules
+      uses: actions/cache@v1
+      with:
+        path: node_modules
+        key: $runner.os-node-$hashFiles('**/package.json')
+        restore-keys: |
+          $runner.os-node-
+    - run: yarn
+    - run: yarn test
+      env:
+        APP_HOST: 'localhost'
+        PORT: 3000
+        APP_SCHEMA: 'http'
+        LOG_LEVEL: 'debug'
+        LOG_OUTPUT: 'dev'
+        LOG_LOGGLY_TOKEN: '1234567890qwertyuiop'
+        LOG_UDP_HOST: 'localhost'
+        LOG_UDP_PORT: '6767'
+        TYPEORM_CONNECTION: 'mongodb'
+        TYPEORM_DATABASE: 'luke-test-v10'
+        TYPEORM_LOGGING: 'error'
+        TYPEORM_DISABLED: false
+        SWAGGER_ENABLED: true
+        SWAGGER_ROUTE: '/swagger'
+        SWAGGER_FILE: '/swagger.json'
+  build-and-push:
+    needs: run-test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: 14.11.0
+    - name: Cache node modules
+      uses: actions/cache@v1
+      with:
+        path: node_modules
+        key: $runner.os-node-$hashFiles('**/package.json')
+        restore-keys: |
+          $runner.os-node-
+    - uses: kciter/aws-ecr-action@v1
+      with:
+        access_key_id: $secrets.AWS_ACCESS_KEY_ID
+        secret_access_key: $secrets.AWS_SECRET_ACCESS_KEY
+        account_id: $secrets.AWS_ACCOUNT_ID
+        repo: ci-typescript-webapp-template
+        region: eu-west-2
+        tags: latest,$github.sha
+        create_repo: true
+        dockerfile: ci.Dockerfile
+        extra_build_args: --build-arg PERSONAL_ACCESS_TOKEN=$secrets.PERSONAL_ACCESS_TOKEN
+  deployment:
+    needs: build-and-push
+    runs-on: self-hosted
+    steps:
+      - name: Deploy Stage
+        uses: fjogeleit/http-request-action@master
+        with:
+          url: '$secrets.DEPLOYER_URI/deploy'
+          method: 'POST'
+          data: '{"branch":"$github.ref","reponame":"typescript-webapp-template","image":"$secrets.AWS_ACCOUNT_ID.dkr.ecr.eu-west-2.amazonaws.com/ci-typescript-webapp-template:$github.sha"}'

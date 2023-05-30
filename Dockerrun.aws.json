@@ -1,0 +1,19 @@
+{
+    "AWSEBDockerrunVersion": "1",
+    "Logging": "/var/log/app",
+    "Ports": [
+        {
+          "ContainerPort": "3000"
+        }
+     ],
+    "Volumes": [
+      {
+        "HostDirectory": "/var/app/current",
+        "ContainerDirectory": "/src/app"
+      }
+    ],
+    "Entrypoint": "start",
+    "Image": {
+        "Update": "true"
+    }
+}

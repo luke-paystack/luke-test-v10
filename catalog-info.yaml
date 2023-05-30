@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: 'Test'
+  description: ''
+  tags:
+    - nodejs
+    - typescript
+    - mysql
+    - mongodb
+    - kafka
+spec:
+  type: service
+  owner: backend-principal-engineers
+  lifecycle: production

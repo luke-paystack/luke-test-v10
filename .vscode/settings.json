@@ -1,0 +1,36 @@
+{  
+    "vetur.format.defaultFormatter.html": "js-beautify-html",
+    "vetur.format.defaultFormatterOptions": {
+      "js-beautify-html": {
+        "wrap_attributes": "auto"
+      }
+    },
+    "vetur.format.defaultFormatter.ts": "vscode-typescript",
+    "editor.suggestSelection": "first",
+    "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
+    "eslint.autoFixOnSave": true,
+    "eslint.workingDirectories": [
+      "./",
+      "./client"
+    ],
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false,
+    "[typescript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "[es-beautifier]": {
+      "useEslintrc": true
+    },
+    "javascript.validate.enable": false,
+    "[javascript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features"
+    },
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true
+    },
+    "git.ignoreLimitWarning": true
+  }
+  

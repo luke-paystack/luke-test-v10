@@ -1,0 +1,11 @@
+{
+    "delay": 1000,
+    "execMap": {
+        "ts": "node -r ts-node/register"
+    },
+    "watch": ["src", ".env"],
+    "ignore": ["**/swagger.json"],
+    "events": {
+        "start": "yarn nps format"
+    }
+}
